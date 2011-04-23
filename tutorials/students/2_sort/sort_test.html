@@ -20,10 +20,44 @@
         return [104, 17, 9, 15, 24, 73, 105, 87, 47, 42, 1];
       }
       function testValidBubbleSort() {
-        // TODO fill in test
+        var iterations = [
+          [17, 23, 29, 47, 19, 53, 73, 71, 5, 13, 91],
+[17,	23,	29,	19,	47,	53,	71,	5,	13,	73,	91],
+[17,	23,	19,	29,	47,	53,	5,	13,	71,	73,	91],
+[17,	19,	23,	29,	47,	5,	13,	53,	71,	73,	91],
+[17,	19,	23,	29,	5,	13,	47,	53,	71,	73,	91],
+[17,	19,	23,	5,	13,	29,	47,	53,	71,	73,	91],
+[17,	19,	5,	13,	23,	29,	47,	53,	71,	73,	91],
+[17,	5,13,	19,	23,	29,	47,	53,	71,	73,	91],
+[5,	13,	17,	19,	23,	29,	47,	53,	71,	73,	91],
+[5,	13,	17,	19,	23,	29,	47,	53,	71,	73,	91]
+        ];
+        var arr = [23, 17, 53, 29, 47, 19, 91, 73, 71, 5, 13];
+        for(var i=0, iterationsSize=iterations.length; i<iterationsSize; i++) {
+          var iteration = iterations[i];
+          arr = itersort_bubblesort(arr, i);
+          assertArrayEquals(iteration, arr);
+        }
       }
       function testValidInsertionSort() {
-        // TODO fill in test
+        var iterations = [
+          [17,	23,	53,	29,	47,	19,	91,	73,	71,	5,	13],
+[17,	23,	53,	29,	47,	19,	91,	73,	71,	5,	13],
+[17,	23,	29,	53,	47,19, 91,	73,	71,	5,	13],
+[17,	23,	29,	47,	53,	19,	91,	73,	71,	5,	13],
+[17,	19,	23,	29,	47,	53,	91,	73,	71,	5,	13],
+[17,	19,	23,	29,	47,	53,	91,	73,	71,	5,	13],
+[17,	19,	23,	29,	47,	53,	73,	91,	71,	5,	13],
+[17,	19,	23,	29,47,	53,	71,	73,	91,	5,	13],
+[5,	17,	19,	23,	29,	47,	53,	71,	73,	91,	13],
+[5,	13,	17,	19,	23,	29,47,	53,	71,	73,	91]          
+        ];
+        var arr = [23, 17, 53, 29, 47, 19, 91, 73, 71, 5, 13];
+        for(var i=0, iterationsSize=iterations.length; i<iterationsSize; i++) {
+          var iteration = iterations[i];
+          arr = itersort_insertionsort(arr, i);
+          assertArrayEquals(iteration, arr);
+        }
       }
       function testValidRadixSort() {
         var iterations = [
