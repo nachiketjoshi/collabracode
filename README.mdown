@@ -18,8 +18,8 @@ In setting up for the program, you will be instructed to fork this repository an
         
 4. Once you have that done, you only need to run the following commands to keep your fork up to date with any changes that have been made in the main repository. Make sure your branch is clean.
 
-	git status
-	git checkout mainline
-	git pull cc master
-	git checkout master
-	git merge mainline
+    git status
+    git checkout mainline
+    git pull cc master
+    git checkout master
+    git merge mainline
