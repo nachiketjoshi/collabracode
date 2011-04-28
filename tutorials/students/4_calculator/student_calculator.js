@@ -44,15 +44,15 @@ function clickMe (event)
 		case "7":
 		case "8":
 		case "9":
-			if (/[+-/*]/.test(prevClick))
+			if (/\+|-|\/|\*|=/.test(prevClick))
 			{
-				prevClick = buttonClicked;
-				setDisplayAsFloat(buttonClicked);
+				setDisplayAsText(buttonClicked);
 			}
 			else
 			{	
-				setDisplayAsFloat(getDisplayAsText() + buttonClicked);
+				setDisplayAsText(getDisplayAsText() + buttonClicked);
 			}
+			prevClick = buttonClicked;
 		break;
 		case "+":
 		case "-":
@@ -61,16 +61,32 @@ function clickMe (event)
 			operation = operatorClick(buttonClicked);
 			break;
 		case "=":
-			setDisplayAsFloat(operation(getDisplayAsFloat()));
+			log (operation);
+			log (getDisplayAsFloat());
+			setDisplayAsText(operation(getDisplayAsFloat()));
+			prevClick = buttonClicked;
 			break;
 		case "C":
 			setDisplayAsText("");
+			prevClick = "";
 			result = 0;
 			break;
 		case "+/-":
-			setDisplayAsFloat(-1 * getDisplayAsFloat());
+			setDisplayAsText(-1 * getDisplayAsFloat());
+			break;
 		case ".":
-			//TODO
+			var currDisplay = getDisplayAsText();
+			if (/\./.test(currDisplay))
+			{/* DO NOTHING */}
+			else if (/\+|-|\/|\*|=/.test(prevClick) || !/^[0-9]/.test(currDisplay))
+			{
+				setDisplayAsText("0.");
+			}
+			else
+			{
+				setDisplayAsText(currDisplay + ".");
+			}
+			prevClick = buttonClicked;
 			break;
 		case "M+":
 		case "M-":
