@@ -3,6 +3,14 @@
     <head> 
         <title>Day 1 - Traversing</title>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+		<script type="text/javascript">
+			$(function () {
+				console.log($("li ul, li ol"));
+				console.log($("li:last-child"));
+				console.log($("li").has("span"));
+			}			
+			)
+		</script>
     </head> 
     <body> 
         <div id="outer-wrapping">
