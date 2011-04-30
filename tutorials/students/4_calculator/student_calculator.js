@@ -61,8 +61,6 @@ function clickMe (event)
 			operation = operatorClick(buttonClicked);
 			break;
 		case "=":
-			log (operation);
-			log (getDisplayAsFloat());
 			setDisplayAsText(operation(getDisplayAsFloat()));
 			prevClick = buttonClicked;
 			break;
@@ -92,6 +90,7 @@ function clickMe (event)
 		case "M-":
 		case "MR":
 		case "MC":
+			alert("Not Yet Implemented :(");
 		default:
 			log (buttonClicked);
 			break;
