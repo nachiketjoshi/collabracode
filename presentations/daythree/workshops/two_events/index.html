@@ -6,6 +6,58 @@
             #comment_form { width: 400px; margin: 10px auto; }
             #comment { height: 70px;}
         </style>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
+		<script type="text/javascript">			
+			$(function () {
+				function checkForm() {
+					var failed = '';
+					$("input").each(function (idx, elem) {
+						var value = $(elem).val();
+						if (value === '')
+						{
+							failed = "Empty " + elem.name;
+						}
+						
+						if (elem.name == "email" && !/@/.test(value))
+						{
+							failed = "Invalid email address";
+						}
+					});
+					
+					if ($("textarea").val().length < 15)
+					{
+						failed = "Comment is too short";
+					}
+					return failed;
+				}
+				
+				function submitForm ()
+				{
+					var failReason = checkForm();
+					if (failReason === '')
+					{
+						$("#fail").hide(50);
+						$("#success").show(100);
+					}
+					else
+					{
+						$("#success").hide(50);
+						$("#fail").show(100).text(failReason);
+					}
+				}
+				
+				$("#success, #fail").hide();
+				$("#submit").bind("click", submitForm);	
+				$("#clear").bind("click", function () 
+				{
+					$("input, textarea").each(function (idx, elem) 
+					{
+						$(this).val("");
+					});
+					$("#success, #fail").hide()
+				});		
+			});
+		</script>
     </head> 
     <body> 
         <div id="outer-wrapping">
@@ -21,6 +73,8 @@
             </ol>
             <form action="#" method="post" id="comment_form">
                 <fieldset>
+                	<div id="success">Submission Success!</div>
+					<div id="fail">Submission Fail!</div>
                     <legend>Add Comment</legend>
                     
                     <div style="float: right;">
@@ -40,7 +94,6 @@
                     <button id="submit" type="button">Submit</button>&nbsp;&nbsp;<a id="clear" href="#">clear</a>
                 </fieldset>
             </form>
-            <script type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
         </div>
     </body> 
 </html>
