@@ -5,10 +5,44 @@
         <style type="text/css" media="screen">
             #comment_form { width: 400px; margin: 10px auto; }
             #comment { height: 70px;}
+			#length_ticker { color: #666; font-size: 0.7em; margin-top: -2px; text-align: right; }
+            .hide { display: none; }
+            .message 
+            {
+                padding: 10px 15px 10px 40px;
+                margin: 10px 0;
+                font-weight: bold;
+                overflow: hidden;
+                -webkit-border-radius: 3px;
+                -moz-border-radius: 3px;
+                border-radius: 3px;
+            }
+
+            .message p 
+            {
+                padding: 0;
+                width: 93%;
+                float: left;
+            }
+
+            .message.error 
+            { 
+                border: 1px solid #e9c59b;
+                background: #ffecce;
+                color: #e3302c;
+            }
+
+            .message.success 
+            {
+                border: 1px solid #bfde84;
+                background: #edfbd8;
+                color: #508600;
+            }
         </style>
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>
 		<script type="text/javascript">			
 			$(function () {
+				var commentMinChars = 15;
 				function checkForm() {
 					var failed = '';
 					$("input").each(function (idx, elem) {
@@ -16,17 +50,20 @@
 						if (value === '')
 						{
 							failed = "Empty " + elem.name;
+							$(elem).css({'color':'red'});
 						}
 						
-						if (elem.name == "email" && !/@/.test(value))
+						if (elem.name == "email" && !/\w+@\w+/.test(value))
 						{
 							failed = "Invalid email address";
+							$(elem).css({'color':'red'});
 						}
 					});
 					
-					if ($("textarea").val().length < 15)
+					if ($("textarea").val().length < commentMinChars)
 					{
 						failed = "Comment is too short";
+						$("textarea").css({'color':'red'});
 					}
 					return failed;
 				}
@@ -37,6 +74,7 @@
 					if (failReason === '')
 					{
 						$("#fail").hide(50);
+						$("input,textarea,label").removeAttr('style');
 						$("#success").show(100);
 					}
 					else
@@ -55,7 +93,20 @@
 						$(this).val("");
 					});
 					$("#success, #fail").hide()
-				});		
+				});
+				$("#comment").bind("keyup", function ()
+				{
+					var lengthToGo = commentMinChars - $(this).val().length;
+					if (lengthToGo > 0) {
+						$("#length_ticker").show();
+						$("#toGo").show();
+						$("#numChars").text((lengthToGo) + " ");
+					}
+					else {
+						$("#numChars").text((commentMinChars + Math.abs(lengthToGo)) + " ");
+						$("#toGo").hide();
+					}
+				});
 			});
 		</script>
     </head> 
@@ -73,13 +124,14 @@
             </ol>
             <form action="#" method="post" id="comment_form">
                 <fieldset>
-                	<div id="success">Submission Success!</div>
-					<div id="fail">Submission Fail!</div>
+                	<div id="success" class="success message">Submission Success!</div>
+					<div id="fail" class="error message">Submission Fail!</div>
                     <legend>Add Comment</legend>
                     
                     <div style="float: right;">
                         <label for="comment">Comment:</label><br />
                         <textarea name="comment" id="comment"></textarea><br />
+						<div id="length_ticker"><span id="numChars">15 </span>characters <span id="toGo">to go</span></div>
                     </div>
                     
                     <label for="name">Name:</label><br />
