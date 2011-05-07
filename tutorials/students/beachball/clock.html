@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			canvas {
+				display:block;
+				margin:20px auto;
+				height:600px;
+				width:600px;
+			}
+		</style>
+		<script type="text/javascript" src="http://sprintf.googlecode.com/files/sprintf-0.7-beta1.js"> </script>
+		<script type="text/javascript">
+			var width = height = 600;
+			var canvas = ctx = false;
+			var frameRate = 1 / 40;  // seconds
+			var frameDelay = frameRate * 1000; // millis
+			var loopTimer = false;
+			var clock = {
+					position: {x: width / 2, y: 0},
+					radius: 112,
+					seconds: {radius: 100, soundPlayed: false},
+					minutes: {radius: 80, soundPlayed: false},
+					hours: {radius: 60, soundPlayed: false},
+					velocity: {x: 2, y: 0},
+					mass: 0.1, // kg
+					restitution: -1.5
+				};
+			var coefficientOfDrag = 0.1; // how aerodynamic is your shape
+			var rho = 0.1; // kg / m2  density of air
+			var A = Math.PI * clock.radius * clock.radius / (10000);
+			var orientation = 0;
+			var seconds = 0, minutes = 0, hours = 0;
+			var mouse = {isDown: false};
+				
+			var mouseDown = function (e) {
+				if (e.which == 1) {		// only on left mouse down
+					mouse.isDown = true;
+					drawDigits();
+				}			
+			}
+			
+			function drawDigits () {
+				ctx.lineWidth = 1;
+				ctx.strokeStyle = 'black';
+				ctx.font = '21px sans-serif';
+				ctx.fillText(sprintf("%02d:%02d:%02d", hours, minutes, seconds), clock.position.x - 45, clock.position.y + 10);
+			}
+			
+			var mouseUp = function (e) {
+				if (e.which == 1) {		// only on left mouse up
+					mouse.isDown = false;
+				}
+			}
+		
+			var setup = function () {
+				canvas = document.getElementById("canvas");
+				ctx = canvas.getContext("2d");
+				ctx.lineCap = 'round';
+				canvas.onmousedown = mouseDown;
+				canvas.onmouseup = mouseUp;
+				loopTimer = setInterval(loop, frameDelay);
+			}
+			
+			var loop = function () {
+				var currTime = new Date();
+				seconds = currTime.getSeconds();
+				minutes = currTime.getMinutes();
+				hours = currTime.getHours();
+				orientation += Math.PI / (10 * frameDelay);
+				
+				// math to decide how clock is moving
+				// drag force : Fd = -1/2 * Cd * A * rho * v * v * (sign)
+				var Fx = -0.5 * coefficientOfDrag * A * rho * clock.velocity.x * clock.velocity.x * (clock.velocity.x / Math.abs(clock.velocity.x));
+				var Fy = -0.5 * coefficientOfDrag * A * rho * clock.velocity.y * clock.velocity.y * (clock.velocity.y / Math.abs(clock.velocity.y));
+				Fx = (isNaN(Fx)) ? 0 : Fx;
+				Fy = (isNaN(Fy)) ? 0 : Fy;
+				
+				// calculate accelaration : a = F / m
+				var ax = Fx / clock.mass;
+				var ay = 0.5 + (Fy / clock.mass);
+				
+				// integrate to get velocity
+				clock.velocity.x += ax * frameRate;
+				clock.velocity.y += ay * frameRate;
+				
+				// integrate to get position
+				clock.position.x += clock.velocity.x * frameRate * 100;
+				clock.position.y += clock.velocity.y * frameRate * 100;
+			
+				// handle collisions
+				if (clock.position.y > height - clock.radius) {
+					clock.velocity.y *= clock.restitution;
+					clock.position.y = height - clock.radius;
+				}
+				if (clock.position.y < clock.radius) {
+					clock.velocity.y *= clock.restitution;
+					clock.position.y = clock.radius;
+				}
+				if (clock.position.x > width - clock.radius) {
+					clock.velocity.x *= clock.restitution;
+					clock.position.x = width - clock.radius;
+				}
+				if (clock.position.x < clock.radius) {
+					clock.velocity.x *= clock.restitution;
+					clock.position.x = clock.radius;
+				}
+				
+				ctx.clearRect(0, 0, width, height);
+				ctx.strokeStyle = 'black';
+				ctx.lineWidth = 1.5;
+				ctx.save();
+				ctx.translate(clock.position.x, clock.position.y);
+				ctx.beginPath();
+				ctx.arc(0, 0, clock.radius, 0, 2 * Math.PI, false);
+				ctx.stroke();
+				ctx.closePath();
+				ctx.restore();
+				
+				drawArc('red', clock.seconds.radius, seconds, 60);
+				if (seconds == 0 && !clock.seconds.soundPlayed) {
+					document.getElementById('seconds').play();
+					clock.seconds.soundPlayed = true;
+				}
+				else {
+					clock.seconds.soundPlayed = false;
+				}
+				drawArc('green', clock.minutes.radius, minutes, 60);
+				if (minutes == 0 && !clock.minutes.soundPlayed) {
+					document.getElementById('minutes').play();
+					clock.minutes.soundPlayed = true;
+				}
+				else {
+					clock.minutes.soundPlayed = false;
+				}
+				drawArc('blue', clock.hours.radius, hours > 12 ? hours - 12 : hours, 12);
+				if (hours == 0 && !clock.hours.soundPlayed) {
+					document.getElementById('hours').play();
+					clock.hours.soundPlayed = true;
+				}
+				else {
+					clock.hours.soundPlayed = false;
+				}
+				
+				if (mouse.isDown) {
+					drawDigits();
+				}
+			}
+			
+			function drawArc (color, radius, value, maxValue) {
+				ctx.lineWidth = 18;
+				ctx.strokeStyle = color;
+				ctx.save();
+				ctx.translate(clock.position.x, clock.position.y);
+				ctx.rotate(orientation);
+				ctx.beginPath();
+				var start = (3 * Math.PI) / 2;
+				var end = ((2 * Math.PI * value) / maxValue) + start;
+				ctx.arc(0, 0, radius, start, end, false);
+				ctx.stroke();
+				ctx.closePath();
+				ctx.restore();
+			}
+		</script>
+	</head>
+	
+	<body onload="setup();">
+		<canvas id="canvas" height="600" width="600">Get a better browser!</canvas>
+		<audio id="seconds" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/boing_poing.wav" preload="auto"></audio>
+		<audio id="minutes" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/chime.wav" preload="auto"></audio>
+		<audio id="hours" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/chime_big_ben.wav" preload="auto"></audio>
+	</body>
+</html>
