@@ -18,14 +18,18 @@
 			var loopTimer = false;
 			var clock = {
 				position: {x: width / 2, y: 0},
-				radius: 112,
-				seconds: {radius: 100, soundPlayed: false},
-				minutes: {radius: 80, soundPlayed: false},
-				hours: {radius: 60, soundPlayed: false},
+				radius: 150,
+				seconds: {radius: 0, soundPlayed: false},
+				minutes: {radius: 0, soundPlayed: false},
+				hours: {radius: 0, soundPlayed: false},
 				velocity: {x: 0, y: 0},
 				mass: 0.1, // kg
-				restitution: -1.25
+				restitution: -0.8
 			};
+			var arcWidth = 0.1 * clock.radius;
+			clock.seconds.radius = clock.radius - (2 * arcWidth);
+			clock.minutes.radius = clock.radius - (4 * arcWidth);
+			clock.hours.radius = clock.radius - (6 * arcWidth);
 			var coefficientOfDrag = 0.1; // how aerodynamic is your shape
 			var rho = 0.1; // kg / m2  density of air
 			var A = Math.PI * clock.radius * clock.radius / (10000);
@@ -34,14 +38,6 @@
 				seconds: 0, minutes: 0, hours: 0,
 				month: 0, date: 0, year: 0
 			};
-			var mouse = {isDown: false};
-
-			function mouseDown (e) {
-				if (e.which == 1) {		// only on left mouse down
-					mouse.isDown = true;
-					drawDigits();
-				}			
-			}
 			
 			function keyDown (e) {
 				switch (e.keyCode) {
@@ -70,26 +66,18 @@
 				}
 			}
 			
-			function drawDigits () {
+			function drawDigitalRepresentation () {
 				ctx.strokeStyle = 'black';
 				ctx.font = '21px verdana';
 				ctx.fillText(sprintf("%02d:%02d:%02d", date.hours, date.minutes, date.seconds), clock.position.x - 50, clock.position.y);
 				ctx.font = '14px verdana';
 				ctx.fillText(sprintf("%02d/%02d/%04d", date.month, date.date, date.year), clock.position.x - 44, clock.position.y + 23);
 			}
-			
-			function mouseUp (e) {
-				if (e.which == 1) {		// only on left mouse up
-					mouse.isDown = false;
-				}
-			}
 		
 			function setup () {
 				canvas = document.getElementById("canvas");
 				ctx = canvas.getContext("2d");
 				ctx.lineCap = 'round';
-				canvas.onmousedown = mouseDown;
-				canvas.onmouseup = mouseUp;
 				loopTimer = setInterval(loop, frameDelay);
 			}
 			
@@ -152,7 +140,7 @@
 				ctx.closePath();
 				ctx.restore();
 				
-				drawArc('red', clock.seconds.radius, date.seconds, 60);
+				drawArc('rgba(255, 0, 0, 0.5)', clock.seconds.radius, date.seconds, 60);
 				if (date.seconds == 0) {
 					if (!clock.seconds.soundPlayed) {
 						document.getElementById('seconds').play();
@@ -162,7 +150,7 @@
 				else {
 					clock.seconds.soundPlayed = false;
 				}
-				drawArc('green', clock.minutes.radius, date.minutes, 60);
+				drawArc('rgba(0, 255, 0, 0.5)', clock.minutes.radius, date.minutes, 60);
 				if (date.minutes == 0) {
 					if (!clock.minutes.soundPlayed) {
 						document.getElementById('minutes').play();
@@ -172,20 +160,8 @@
 				else {
 					clock.minutes.soundPlayed = false;
 				}
-				drawArc('blue', clock.hours.radius, date.hours, 12);
-				if (date.hours == 0) {
-					if (!clock.hours.soundPlayed) {
-						document.getElementById('hours').play();
-						clock.hours.soundPlayed = true;
-					}
-				}
-				else {
-					clock.hours.soundPlayed = false;
-				}
-				
-				if (mouse.isDown) {
-					drawDigits();
-				}
+				drawArc('rgba(0, 0, 255, 0.5)', clock.hours.radius, date.hours, 12);				
+				drawDigitalRepresentation();
 			}
 			
 			function drawArc (color, radius, value, maxValue) {
@@ -200,6 +176,16 @@
 				ctx.arc(0, 0, radius, start, end, false);
 				ctx.stroke();
 				ctx.closePath();
+
+				// Draw digits on the face
+				for(var i = 0; i <= value; i += parseInt(maxValue / 12)) {
+				    ctx.lineWidth = 1;
+				    ctx.strokeStyle = 'black';
+				    ctx.font = (arcWidth * 0.8) + 'px sans-serif';
+				    var xCoord = radius * Math.cos((2 * Math.PI * i / maxValue) - (Math.PI / 2));
+   				    var yCoord = radius * Math.sin((2 * Math.PI * i / maxValue) - (Math.PI / 2));
+				    ctx.strokeText(i, xCoord, yCoord);
+				}
 				ctx.restore();
 			}
 			
@@ -209,8 +195,7 @@
 	
 	<body onload="setup();">
 		<canvas id="canvas" height="600" width="600">Get a better browser!</canvas>
-		<audio id="seconds" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/boing_poing.wav" preload="auto"></audio>
-		<audio id="minutes" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/chime.wav" preload="auto"></audio>
-		<audio id="hours" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/chime_big_ben.wav" preload="auto"></audio>
+		<audio id="seconds" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/chime.wav" preload="auto"></audio>
+		<audio id="minutes" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/chime_big_ben.wav" preload="auto"></audio>
 	</body>
 </html>
