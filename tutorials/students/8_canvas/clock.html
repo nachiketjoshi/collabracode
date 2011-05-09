@@ -5,20 +5,20 @@
 			canvas {
 				display:block;
 				margin:20px auto;
-				height:600px;
-				width:600px;
+				height:800px;
+				width:800px;
 			}
 		</style>
 		<script type="text/javascript" src="http://sprintf.googlecode.com/files/sprintf-0.7-beta1.js"> </script>
 		<script type="text/javascript">
-			var width = height = 600;
+			var width = height = 800;
 			var canvas = ctx = false;
 			var frameRate = 1 / 40;  // seconds
 			var frameDelay = frameRate * 1000; // millis
 			var loopTimer = false;
 			var clock = {
 				position: {x: width / 2, y: 0},
-				radius: 150,
+				radius: 200,
 				seconds: {radius: 0, soundPlayed: false},
 				minutes: {radius: 0, soundPlayed: false},
 				hours: {radius: 0, soundPlayed: false},
@@ -43,19 +43,19 @@
 				switch (e.keyCode) {
 					case 37:	// left
 					case 72:	// h
-						clock.velocity.x -= 8;
+						clock.velocity.x -= 10;
 						break;
 					case 40:	// down
 					case 74:	// j
-						clock.velocity.y += 8;
+						clock.velocity.y += 10;
 						break;
 					case 38:	// up
 					case 75:	// k
-						clock.velocity.y -= 8;
+						clock.velocity.y -= 10;
 						break;
 					case 39:	// right
 					case 76:	// l
-						clock.velocity.x += 8;
+						clock.velocity.x += 10;
 						break;					
 					case 32:	// spacebar
 						clock.velocity.x = 0;
@@ -184,9 +184,23 @@
 				    ctx.font = (arcWidth * 0.8) + 'px sans-serif';
 				    var xCoord = radius * Math.cos((2 * Math.PI * i / maxValue) - (Math.PI / 2));
    				    var yCoord = radius * Math.sin((2 * Math.PI * i / maxValue) - (Math.PI / 2));
-				    ctx.strokeText(i, xCoord, yCoord);
+   				    var xDisplacement = (i < 10) ? arcWidth / 4 : arcWidth / 2;
+   				    var yDisplacement = arcWidth / 4;
+				    ctx.strokeText(i, xCoord - xDisplacement, yCoord + yDisplacement);
+				    
+				    ctx.strokeStyle = color;
+				    ctx.fillStyle = color;
+    				ctx.beginPath();
+					ctx.arc(xCoord, yCoord, (0.5 * arcWidth), 0, (2 * Math.PI), false);
+				    ctx.globalAlpha = 0.2;
+					ctx.fill();
+					ctx.globalAlpha = 0.8;
+					ctx.stroke();
+					ctx.closePath();
 				}
+				
 				ctx.restore();
+				ctx.globalAlpha = 1;
 			}
 			
 			window.addEventListener('keydown', keyDown, true);
@@ -194,7 +208,7 @@
 	</head>
 	
 	<body onload="setup();">
-		<canvas id="canvas" height="600" width="600">Get a better browser!</canvas>
+		<canvas id="canvas" height="800" width="800">Get a better browser!</canvas>
 		<audio id="seconds" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/chime.wav" preload="auto"></audio>
 		<audio id="minutes" src="http://www.wavsource.com/snds_2011-04-24_3898073297300706/sfx/chime_big_ben.wav" preload="auto"></audio>
 	</body>
